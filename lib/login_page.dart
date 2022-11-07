@@ -1,5 +1,10 @@
 import 'package:chat_app/chat_page.dart';
+import 'package:chat_app/utils/spaces.dart';
 import 'package:flutter/material.dart';
+import 'package:chat_app/utils/textfield_styles.dart';
+import 'package:chat_app/widgets/login_text_field.dart';
+import 'package:social_media_buttons/social_media_buttons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginPage extends StatelessWidget {
   final _formkey = GlobalKey<FormState>();
@@ -18,6 +23,8 @@ class LoginPage extends StatelessWidget {
       print("Not Successful");
     }
   }
+
+  final Uri _url = Uri.parse("https://poojabhaumik.com");
 
   @override
   Widget build(BuildContext context) {
@@ -39,8 +46,9 @@ class LoginPage extends StatelessWidget {
                   letterSpacing: 0.5,
                 ),
               ),
+              verticalSpacing(5.0),
               Text(
-                "Welcome back!\n You've been missed!",
+                "Welcome back!",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -48,15 +56,17 @@ class LoginPage extends StatelessWidget {
                   color: Colors.blueGrey,
                 ),
               ),
-              Image.network(
-                'https://3009709.youcanlearnit.net/Alien_LIL_131338.png',
-                height: 200,
-              ),
+              verticalSpacing(10.0),
+              // Image.network(
+              //   'https://3009709.youcanlearnit.net/Alien_LIL_131338.png',
+              //   height: 200,
+              // ),
               Form(
                 key: _formkey,
                 child: Column(
                   children: [
-                    TextFormField(
+                    LoginTextField(
+                      hasAsterisks: false,
                       validator: (value) {
                         if (value != null &&
                             value.isNotEmpty &&
@@ -68,23 +78,15 @@ class LoginPage extends StatelessWidget {
                         return null;
                       },
                       controller: userNameController,
-                      decoration: InputDecoration(
-                        hintText: 'Username',
-                        hintStyle: TextStyle(color: Colors.blueGrey),
-                        border: OutlineInputBorder(),
-                      ),
+                      hintText: 'Username',
                     ),
-                    SizedBox(height: 10.0),
-                    TextFormField(
+                    verticalSpacing(10.0),
+                    LoginTextField(
+                      hasAsterisks: true,
                       controller: passwordController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        hintText: 'Password',
-                        hintStyle: TextStyle(color: Colors.blueGrey),
-                        border: OutlineInputBorder(),
-                      ),
+                      hintText: 'Password',
                     ),
-                    SizedBox(height: 4.0),
+                    verticalSpacing(4.0),
                   ],
                 ),
               ),
@@ -95,16 +97,29 @@ class LoginPage extends StatelessWidget {
                   style: TextStyle(fontSize: 20.0),
                 ),
               ),
-              InkWell(
-                onTap: () {
-                  print('ontap');
+              GestureDetector(
+                onTap: () async {
+                  if (!await launchUrl(_url)) {
+                    throw 'Could not launch this!';
+                  }
                 },
                 child: Column(
                   children: [
                     Text('Find us on'),
-                    Text('The link url should be here'),
+                    Text("$_url"),
                   ],
                 ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SocialMediaButton.twitter(
+                      color: Colors.blue,
+                      url: "https://twitter.com/pooja_bhaumik"),
+                  SocialMediaButton.linkedin(
+                      color: Colors.blue,
+                      url: "https://linkedin.com/in/pooja26"),
+                ],
               ),
             ],
           ),
