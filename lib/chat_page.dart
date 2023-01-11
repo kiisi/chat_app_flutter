@@ -1,12 +1,12 @@
 import 'dart:convert';
-import 'package:chat_app/models/image_model.dart';
+import 'package:chat_app/services/auth_services.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_app/widgets/chat_bubble.dart';
 import 'package:chat_app/widgets/chat_input.dart';
 import 'package:chat_app/models/chat_message_entity.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:chat_app/repo/image_repository.dart';
+import 'package:provider/provider.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -17,8 +17,6 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   List<ChatMessageEntity> _messages = [];
-
-  ImageRepository _imageRepo = ImageRepository();
 
   _loadInitialMessages() async {
     final response = await rootBundle.loadString("assets/mock_messages.json");
@@ -46,7 +44,9 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     final username = ModalRoute.of(context)!.settings.arguments as String;
+
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text('Hi $username'),
         backgroundColor: Colors.transparent,
@@ -54,6 +54,7 @@ class _ChatPageState extends State<ChatPage> {
         actions: [
           IconButton(
             onPressed: () {
+              context.read<AuthServices>().logoutUser();
               Navigator.pushReplacementNamed(context, '/');
             },
             icon: Icon(
@@ -65,23 +66,14 @@ class _ChatPageState extends State<ChatPage> {
       ),
       body: Column(
         children: [
-          FutureBuilder<List<PixelFordImage>>(
-            future: _imageRepo.getNetworkImages(),
-            builder: (BuildContext context,
-                AsyncSnapshot<List<PixelFordImage>> snapshot) {
-              if (snapshot.hasData)
-                return Image.network(snapshot.data![0].urlSmallSize);
-
-              return CircularProgressIndicator();
-            },
-          ),
           Expanded(
             child: ListView.builder(
               itemCount: _messages.length,
               itemBuilder: (context, index) {
                 return ChatBubble(
                   entity: _messages[index],
-                  alignment: _messages[index].author.username == 'kiisi'
+                  alignment: _messages[index].author.username ==
+                          context.read<AuthServices>().getUsername()
                       ? Alignment.centerRight
                       : Alignment.centerLeft,
                 );

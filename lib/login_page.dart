@@ -1,10 +1,12 @@
 import 'package:chat_app/chat_page.dart';
+import 'package:chat_app/services/auth_services.dart';
 import 'package:chat_app/utils/spaces.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_app/utils/textfield_styles.dart';
 import 'package:chat_app/widgets/login_text_field.dart';
 import 'package:social_media_buttons/social_media_buttons.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatelessWidget {
   final _formkey = GlobalKey<FormState>();
@@ -12,10 +14,13 @@ class LoginPage extends StatelessWidget {
   final userNameController = TextEditingController();
   final passwordController = TextEditingController();
 
-  void login(context) {
+  Future<void> login(BuildContext context) async {
     if (_formkey != null && _formkey.currentState!.validate()) {
       print(userNameController.text);
       print(passwordController.text);
+
+      await context.read<AuthServices>().loginUser(userNameController.text);
+
       Navigator.pushReplacementNamed(context, '/chat',
           arguments: '${userNameController.text}');
       print("Login Successful");
@@ -29,6 +34,7 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Center(
         child: Padding(
           padding: EdgeInsets.all(20.0),
@@ -91,7 +97,7 @@ class LoginPage extends StatelessWidget {
                 ),
               ),
               ElevatedButton(
-                onPressed: () => login(context),
+                onPressed: () async => await login(context),
                 child: Text(
                   'Login',
                   style: TextStyle(fontSize: 20.0),
